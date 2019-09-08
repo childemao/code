@@ -33,7 +33,7 @@ namespace bit
 			{
 				char* pstr = new char[s._capacity + 1];
 				strcpy(pstr, s._str);
-				delete[] s._str;
+				delete[] _str;
 				_str = pstr;
 				_capacity = s._capacity;
 				_size = s._size;
@@ -146,7 +146,7 @@ namespace bit
 		bool operator<(const string& s);
 		bool operator<=(const string& s);
 		bool operator>(const string& s);
-		bool operator<=(const string& s);
+		bool operator>=(const string& s);
 		bool operator==(const string& s);
 		bool operator!=(const string& s);
 		size_t Find(char c, size_t pos = 0) const;
@@ -161,9 +161,77 @@ namespace bit
 		size_t _capacity;
 		size_t _size;
 	};
+	//输出运算符重载
 	ostream& operator<<(ostream& _cout, const bit::string& s)
 	{
 		cout << s._str;
 		return _cout;
 	}
+}
+void testbitstring1()
+{
+	bit::string s1;
+	bit::string s2("hello word");
+	bit::string s3(s2);
+	s1 = s3;
+	cout << s1 << endl;
+	cout << s2 << endl;
+	cout << s3 << endl;
+}
+void testbitstring2()
+{
+	bit::string s1("hello");
+	s1.Pushback(' ');
+	s1.Pushback('b');
+	s1.Pushback('i');
+	s1 += 't';
+	cout << s1 << endl;
+	cout << s1.capacity() << endl;
+	auto it = s1.begin();
+	while (it != s1.end())
+	{
+		cout << *it;
+		++it;
+	}
+	cout << endl;
+	bit::string s2("hello world!!!");
+	s1.swap(s2);
+	cout << s1 << endl;
+	cout << s2 << endl;
+}
+void testbitstring3()
+{
+	bit::string s("hello");
+
+	cout << s << endl;
+	//cout << s.size << endl;
+	//cout << s.capacity << endl;
+
+
+	//s.Resize(10, 'a');
+	//cout << s << endl;
+	//cout << s.size << endl;
+	//cout << s.capacity << endl;
+
+	//s.Resize(20);
+	//cout << s << endl;
+	//cout << s.size << endl;
+	//cout << s.capacity << endl;
+
+	//s.Resize(5);
+	//cout << s << endl;
+	//cout << s.size << endl;
+	//cout << s.capacity << endl;
+
+	//s.Resize(50);
+	//cout << s << endl;
+	//cout << s.size << endl;
+	//cout << s.capacity << endl;
+}
+int main()
+{
+	testbitstring1();
+	testbitstring2();
+	testbitstring3();
+	return 0;
 }
