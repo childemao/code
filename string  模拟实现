@@ -1,0 +1,169 @@
+#include<iostream>
+#include<assert.h>
+using namespace std;
+namespace bit
+{
+	class string
+	{
+	public:
+		typedef char* Iterator; 
+	public:
+		string(const char* str = "")
+		{
+			if (nullptr == str)
+			{
+				assert(false);
+				return;
+			}
+			_size = strlen(str);
+			_capacity = _size;
+			_str = new char[_capacity + 1];
+			strcpy(_str, str);
+		}
+		string(const string& s)
+			:_str(new char[s._capacity + 1])
+			,_capacity(s._capacity)
+			,_size(s._size)
+		{
+			strcpy(_str, s._str);
+		}
+		string& operator=(const string& s)
+		{
+			if (this != &s)
+			{
+				char* pstr = new char[s._capacity + 1];
+				strcpy(pstr, s._str);
+				delete[] s._str;
+				_str = pstr;
+				_capacity = s._capacity;
+				_size = s._size;
+			}
+			return *this;
+		 }
+		~string()
+		{
+			if (_str)
+			{
+				delete[] _str;
+				_str = nullptr;
+			}
+		}
+		//迭代器
+		Iterator begin()
+		{
+			return _str;
+		}
+		Iterator end()
+		{
+			return _str + _size;
+		}
+		void Pushback(char c)
+		{
+			if (_size == _capacity)
+				Reserve(_capacity * 2);
+			_str[_size++] = c;
+			_str[_size] = '\0';
+		}
+		void Append(size_t n, char c)
+		{
+			for (size_t i = 0; i < n; ++i)
+			{
+				Pushback(c);
+			}
+		}
+		string& operator+=(char c)
+		{
+			Pushback(c);
+			return *this;
+		}
+		//暂没实现
+		//void Append(const char* str);    
+		//string& operator+=(const char* str);
+		void clear()
+		{
+			_size = 0;
+			_str[_size] = '\0';
+		}
+		void swap(string& s)
+		{
+			std::swap(_str, s._str);
+			std::swap(_size, s._size);
+			std::swap(_capacity, s._capacity);
+		}
+		const char* C_str()const
+		{
+			return _str;
+		}
+		//容积
+		size_t size()const
+		{
+			return _size;
+		}
+		size_t capacity()const
+		{
+			return _capacity;
+		}
+		bool Empty()const
+		{
+			return 0 == _size;
+		}
+		
+		void Resize(size_t newsize,char c = char())//扩展到。。。个
+		{
+			if (newsize > _size)
+			{//容量可以装下
+				if (newsize >= _capacity)
+				{
+					Reserve(newsize);
+				}
+				memset(_str + _size, c, newsize - _size);
+			}
+			_size = newsize;
+			_str[newsize] = '\0';
+		}
+		void Reserve(size_t newcapacity)
+		{
+			if (newcapacity >= _capacity)
+			{
+				char* str = new char[newcapacity + 1];
+				strcpy(str, _str);
+				delete[] _str;
+				_str = str;
+				_capacity = newcapacity;
+			}
+		}
+		char& operator[](size_t index)
+		{
+			assert(index < _size);
+			return _str[index];
+		}
+		const char& operator[](size_t index)const
+		{
+			assert(index < _size);
+			return _str[index];
+		}
+		//
+		bool operator<(const string& s);
+		bool operator<=(const string& s);
+		bool operator>(const string& s);
+		bool operator<=(const string& s);
+		bool operator==(const string& s);
+		bool operator!=(const string& s);
+		size_t Find(char c, size_t pos = 0) const;
+		string SubStr(size_t pos, size_t n);
+		string& Insert(size_t pos, char c);   
+		string& Insert(size_t pos, const char* str);
+		string& Erase(size_t pos, size_t len);
+		private:
+			friend ostream& operator<<(ostream& _cout, const bit::string& s);
+	private:
+		char* _str;
+		size_t _capacity;
+		size_t _size;
+	};
+	ostream& operator<<(ostream& _cout, const bit::string& s)
+	{
+		cout << s._str;
+		return _cout;
+	}
+}
