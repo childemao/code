@@ -1,0 +1,47 @@
+#include<iostream>
+using namespace std;
+template<class T>
+bool Isequal(T left, T right)
+{
+	return left == right;
+}
+void test()
+{
+	const char* p1 = "hello";
+	const char* p2 = "world";
+	if (Isequal(p1, p2))
+	{
+		cout << p1;
+	}
+	else
+		cout << p2;
+}
+template<>
+bool Isequal<char*>(char* left, char* right)
+{
+	if (strcpy(left, right) > 0)
+	{
+		return true;
+	}
+	else
+		return false;
+}
+template<class T>
+void Copy(T* dst, const T* src, size_t size)
+{ 
+	for (size_t i = 0; i < size; ++i)
+	{ 
+		dst[i] = src[i]; 
+	}
+}
+template<class T> 
+void Copy(T* dst, const T* src, size_t size)
+{
+	memcpy(dst, src, sizeof(T) * size); 
+}
+int main()
+{
+ test();
+ 
+ return 0;
+}
