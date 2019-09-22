@@ -1,0 +1,40 @@
+//解法一：
+#include<iostream>
+using namespace std;
+int Fibonacci(int n)
+{
+		int left = 0;
+		int right = 1;
+		int fib = 0;
+		int a[] = { 0,1 };
+		if (n < 2)
+			return a[n];
+
+		for (int i = 2; i <= n; ++i)
+		{
+			fib = left + right;
+			left = right;
+			right = fib;
+		}
+		return fib;
+}
+
+
+//解法二：
+int Fibonacci(int n)
+{
+	if (n == 0)
+		return 0;
+	if (n == 1)
+		return 1;
+    if( n >= 2)
+		return Fibonacci(n - 1) + Fibonacci(n - 2);
+}
+int main()
+{
+	int n = 0;
+	cin >> n;
+	int d = Fibonacci(n);
+	cout << d << endl;
+	return 0;
+}
