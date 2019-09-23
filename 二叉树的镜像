@@ -1,0 +1,32 @@
+#include<iostream>
+using namespace std;
+//交换左右子树就行
+struct TreeNode
+{
+	int val;
+	struct TreeNode* left;
+	struct TreeNode* right;
+
+};
+void Mirror(TreeNode* pRoot)
+{
+		if (pRoot == nullptr)
+			return;
+		if (pRoot->left == nullptr && pRoot->right == nullptr)
+			return;
+		TreeNode * node = pRoot->left;
+		pRoot->left = pRoot->right;
+		pRoot->right = node;
+		Mirror(pRoot->left);
+		Mirror(pRoot->right);
+
+}
+int main()
+{
+	TreeNode* root = (TreeNode*)malloc(sizeof(TreeNode));
+	root->val = 1;
+	root->left->val = 2;
+	root->right->val = 3;
+	Mirror(root);
+	return 0;
+}
