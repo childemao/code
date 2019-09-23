@@ -1,0 +1,38 @@
+#include<iostream>
+using namespace std;
+#include<stack>
+stack<int> s1;
+stack<int> s2;
+void push(int node)
+{
+	s1.push(node);
+}
+int pop()
+{
+	if (s2.size() <= 0)
+	{
+		while (s1.size() != 0)
+		{
+			int a = s1.top();
+			s2.push(a);
+			s1.pop();
+		}
+	}
+	int c = s2.top();
+	s2.pop();
+	return c;
+}
+int main()
+{
+	push(1);
+	push(2);
+	push(3);
+	push(4);
+	push(5);
+	pop();
+	pop();
+	pop();
+	pop();
+	cout << s2.top();
+
+}
