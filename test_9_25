@@ -1,0 +1,68 @@
+#include<iostream>
+using namespace std;
+//class Base
+//{
+//public:
+//	virtual Base* TestFunc()
+//	{
+//		cout << "Base::TestFunc()" << endl;
+//		return this;
+//	}
+//
+//};
+//class Derived :public Base
+//{
+//public:
+//	virtual Derived* TestFunc()
+//	{
+//		cout << "Derived::TestFunc()" << endl;
+//		return this;
+//	}
+//};
+//void TestVirtualFunc(Base* pd)
+//{
+//	pd->TestFunc();
+//}
+//int main()
+//{
+//	Derived d;
+//	TestVirtualFunc(&d);
+//	return 0;
+//}
+
+//析构函数可以是虚函数
+class Base
+{
+public:
+	virtual~Base()
+	{
+		cout << "Base::~Base()" << endl;
+	}
+protected:
+	int _b;
+};
+class Derived :public Base
+{
+public:
+	Derived()
+	{
+		_p = new int[10];
+	}
+	~Derived()
+	{
+		if (_p)
+		{
+			delete[] _p;
+		}
+		cout << "Derived::~Derived()" << endl;
+	}
+protected:
+	int* _p;
+};
+
+int main()
+{
+	Base* pb = new Derived;
+	delete pb;
+	return 0;
+}
