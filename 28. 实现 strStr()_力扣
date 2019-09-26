@@ -1,0 +1,65 @@
+/*
+实现 strStr() 函数。
+给定一个 haystack 字符串和一个 needle 字符串，在 haystack 
+字符串中找出 needle 字符串出现的第一个位置 (从0开始)。
+如果不存在，则返回  -1。
+
+示例 1:
+输入: haystack = "hello", needle = "ll"
+输出: 2
+
+示例 2:
+输入: haystack = "aaaaa", needle = "bba"
+输出: -1
+*/
+//方法一：同时遍历两个字符串，如果两个字符相同，移动两个指针，如果不相同，第二个字符串的指针
+//不动，第一个移动，直到有一个字符串遍历到结尾，最后判断第二个字符串到末尾，没到，说明没有相同的
+#include<iostream>
+using namespace std;
+#include<string>
+int strStr(string haystack, string needle)
+{
+	if (needle.empty())
+		return 0;
+	if (needle.size() > haystack.size())
+		return 0;
+
+	int j = 0;
+	int i = 0;
+	while (haystack[i] != '\0' && needle[j] != '\0')
+	{
+		if (haystack[i] == needle[j])
+		{
+			i++;
+			j++;
+		}
+		else
+		{
+			i = i - j + 1;//记录没找到相同字符前的个数
+			j = 0;
+		}
+	}
+	if (needle[j] == '\0')
+		return i - j;
+	return -1;
+}
+//方法二：直接用容器里的查找
+int strStr1(string haystack, string needle)
+{
+	if (needle.empty())
+		return 0;
+	int pos = haystack.find(needle);
+	return pos;
+}
+
+int main()
+{
+	string s1 = "hello";
+	string s2 = "ll";
+	int c = strStr(s1, s2);
+	int d = strStr1(s1, s2);
+	cout << c << endl;
+	cout << d << endl;
+
+	return 0;
+}
