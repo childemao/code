@@ -1,0 +1,31 @@
+//只构建一个类的对象
+#include<iostream>
+using namespace std;
+class Singleton
+{
+public:
+	static Singleton* Getinstance(int a)
+	{
+  //此方法只适合单线程
+		if (nullptr == p)
+			p = new Singleton(a);
+
+		return p;
+	}
+private:
+	Singleton(int a)
+	{}
+  //不能调用拷贝构造函数：  方法一：只声明，不实现
+  //                      方法二：c++11 中 用delete;
+	Singleton(const Singleton&) = delete;
+
+	static Singleton* p;
+};
+Singleton* Singleton::p = nullptr;
+
+int main()
+{
+	Singleton* ps1 = Singleton::Getinstance(20);
+  Singleton* ps2 = Singleton::GetInstance(20);
+	return 0;
+}
