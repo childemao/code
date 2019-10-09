@@ -1,0 +1,136 @@
+#define _CRT_SECURE_NO_WARNINGS 1
+#include<setjmp.h>
+#include<iostream>
+using namespace std;
+
+//class Single
+//{
+//public:
+//	static Single* Getsingle(int a)
+//	{
+//		if (p == nullptr)
+//		{
+//		 p = new Single(a);
+//			return p;
+//		}
+//	}
+//private:
+//	Single(int a)
+//	{}
+//	Single(const Single&) = delete;
+//
+//	static Single* p;
+//};
+//Single* Single::p = nullptr;
+//
+//int main()
+//{
+//	Single* ps1 = Single::Getsingle(10);
+//
+//	return 0;
+//}
+
+
+//异常退出
+//int Div(int a, int b)
+//{
+//	if (0 == b)
+//		exit(0);
+//	return a / b;
+//}
+//int main()
+//{
+//	int a = 10;
+//	int b = 5;
+//	Div(a, 0);
+//
+//	return 0;
+//}
+
+
+//GetLastError 获取最近错误的错误码
+//#include <windows.h>
+//int main()
+//{
+//	FILE* pf = fopen("333.txt", "rb");
+//	if (nullptr == pf)
+//	{
+//		size_t errNo = GetLastError();//获取最近发生错误码（Windows系统维护）
+//		cout << errNo << endl;
+//	}
+//
+//	fclose(pf);
+//	return 0;
+//}
+
+
+//goto只能在函数范围内跳转
+//int Div(int a, int b)
+//{
+//	if (0 == b)
+//		goto L;
+//
+//	return a / b;
+//}
+//int main()
+//{
+//	Div(10, 0);
+//L:
+//	return 0;
+//}
+
+//程序可以运行
+//int main()
+//{
+//http://www.badiu.com;      //相当于标签和注释
+//	cout << "hello" << endl;
+//	return 0;
+//}
+
+
+jmp_buf buff;
+
+void TestFunc1()
+{
+	FILE* pf = fopen("333.txt", "rb");
+	if (nullptr == pf)
+	{
+		longjmp(buff, 1);
+	}
+	fclose(pf);
+}
+void TestFunc2()
+{
+	char* p = (char*)malloc(0x7fffffff);
+	if (nullptr == p)
+	{
+		longjmp(buff, 2);
+	}
+	free(p);
+}
+int main()
+{
+	// setjmp函数在首次调用：设置longjmp的跳转点buff
+	int state = setjmp(buff);
+	// buff: 中记录当前位置程序中寄存器状态信息
+	// 第一次调用时，该函数一定返回0
+	if (0 == state)
+	{
+		TestFunc2();
+		TestFunc1();
+	}
+	else
+	{
+		switch (state)
+		{
+		case 1:
+			cout << "打开文件失败" << endl;
+		case 2:
+			cout << "malloc申请空间失败" << endl;
+		default:
+			cout << "未知错误" << endl;
+		}
+	}
+	return 0;
+}
+
