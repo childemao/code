@@ -1,0 +1,82 @@
+#define _CRT_SECURE_NO_WARNINGS 1
+#include<iostream>
+using namespace std;
+
+
+//void TestFunc1()
+//{
+//	FILE* pf = fopen("333.txt", "rb");
+//	if (nullptr == pf)
+//	{
+//		throw 1;//必须进行捕获，不然代码崩溃
+//	}
+//	fclose(pf);
+//}
+//void TestFunc2()
+//{
+//	char* p = (char*)malloc(0x7fffffff);
+//	if (nullptr == p)
+//	{
+//		throw "2";
+//	}
+//	free(p);
+//}
+//
+//int main()
+//{
+//	try 
+//	{
+//		TestFunc1();
+//		TestFunc2();
+//
+//	}
+//	catch (int err)
+//	{
+//		cout << err << endl;
+//	}
+//	catch (char err)
+//	{
+//		cout << err << endl;
+//	}
+//
+//	return 0;
+//}
+
+//void TestFunc()
+//{
+//	int e = 10;
+//	cout << &e << endl;
+//	throw e; // 抛出异常，相当于代码非法退出
+//}
+//
+//int main()
+//{
+//	try
+//	{
+//		TestFunc();
+//	}
+//	catch (int& err)
+//	{
+//		cout << &err << endl;
+//	}
+//	return 0;
+//}
+
+
+int  NumberOf1(int n)
+{
+	int count = 0;
+	while (n != 0)
+	{
+		count++;
+		n = n & (n - 1);
+	}
+	return count;
+}
+int main()
+{
+	int n = 3;
+	int c = NumberOf1(n);
+	cout << c << endl;
+	return 0;
+}
