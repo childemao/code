@@ -1,0 +1,89 @@
+#include<iostream>
+using namespace std;
+//智能指针
+//缺陷：线程问题
+namespace bite
+{
+	template<class T>
+	class shared_ptr
+	{
+	public:
+		shared_ptr(T* ptr = nullptr)
+			:_ptr(ptr)
+			, _pCount(nullptr)
+		{
+			if (_ptr)
+				_pCount = new int(1);
+		}
+		shared_ptr(const shared_ptr<T>& sp)
+			:_ptr(sp._ptr)
+			, _pCount(sp._pCount)
+		{
+			if (_ptr)
+				++* _pCount;
+		}
+		shared_ptr<T>& operator=(const shared_ptr<T>& sp)
+		{
+			if (this != &sp)
+			{
+				Release();
+				_ptr = sp._ptr;
+				_pCount = sp._pCount;
+				if (_pCount)
+					++* _pCount;
+			}
+			return *this;
+		}
+		~shared_ptr()
+		{
+			Release();
+		}
+		T& operator*()
+		{
+			return *_ptr;
+		}
+		T* operator->()
+		{
+			return _ptr;
+		}
+		int use_count()
+		{
+			return *_pCount;
+		}
+	private:
+		void Release()
+		{
+			if (_ptr && 0 == -- * _pCount)
+			{
+				delete _ptr;
+				delete _pCount;
+			}
+		}
+	protected:
+		T* _ptr;
+		int* _pCount;
+	};
+}
+void Testshared_ptr()
+{
+	bite::shared_ptr<int> sp1(new int);
+	bite::shared_ptr<int> sp2(sp1);
+	cout << sp1.use_count() << endl;
+	cout << sp2.use_count() << endl;
+
+	bite::shared_ptr<int> sp3(new int);
+	bite::shared_ptr<int> sp4(sp3);
+	cout << sp3.use_count() << endl;
+	cout << sp4.use_count() << endl;
+	sp3 = sp1;
+	cout << sp1.use_count() << endl;
+
+	sp4 = sp1;
+	cout << sp1.use_count() << endl;
+
+}
+int main()
+{
+	Testshared_ptr();
+	return 0;
+}
