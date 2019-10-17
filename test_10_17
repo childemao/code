@@ -1,0 +1,194 @@
+#include<iostream>
+using namespace std;
+
+//RAII 是一种利用对象生命周期来控制程序资源
+//在对象构造时获取资源，接着控制对资源的访问使之在对象的生命周期内始终保持有效，最后在对象析构的
+//时候释放资源。借此，我们实际上把管理一份资源的责任托管给了一个对象。这种做法有两大好处：
+//不需要显式地释放资源。
+//采用这种方式，对象所需的资源在其生命期内始终保持有效
+
+//浅拷贝问题
+//template<class T>
+//class SmartPtr
+//{
+//public:
+//	SmartPtr(T* ptr)
+//		:_ptr(ptr)
+//	{}
+//	~SmartPtr()
+//	{
+//		if (_ptr)
+//		{
+//			delete _ptr;
+//		}
+//	}
+//	T& operator*()
+//	{
+//		return *_ptr;
+//	}
+//	T* operator->()
+//	{
+//		return _ptr;
+//	}
+//private:
+//	T* _ptr;
+//};
+//struct A
+//{
+//	int a;
+//	int b;
+//	int c;
+//};
+//void TestFunc1()
+//{
+//		SmartPtr<int> sp1(new int);
+//		*sp1 = 100;
+//		SmartPtr<A> sp2(new A);
+//		sp2->a = 10;
+//		sp2->b = 20;
+//		sp2->c = 30;
+//}
+//int main()
+//{
+//	TestFunc1();
+//	return 0;
+//}
+
+
+//c++98 auto_ptr   原理：资源转移
+//namespace bite
+//{
+//	template<class T>
+//	class auto_ptr 
+//	{
+//	public:
+//		auto_ptr(T* ptr)
+//			:_ptr(ptr)
+//		{}
+//		auto_ptr(auto_ptr<T>& ap)
+//			:_ptr(ap._ptr)
+//		{
+//			ap._ptr = nullptr;
+//		}
+//		auto_ptr<T>& operator=(auto_ptr<T>& ap)
+//		{
+//			if (this != &ap)
+//			{
+//				if (_ptr)
+//					delete _ptr;
+//				_ptr = ap._ptr;
+//				ap._ptr = nullptr;
+//			}
+//			return *this;
+//		}
+//		~auto_ptr()
+//		{
+//			if (_ptr)
+//				delete _ptr;
+//		}
+//		T& operator*()
+//		{
+//			return *_ptr;
+//		}
+//		T* operator->()
+//		{
+//			return _ptr;
+//		}
+//	private:
+//		T* _ptr;
+//	};
+//	
+//}
+//void TestFunc()
+//{
+//	bite::auto_ptr<int> ap1(new int);
+//	bite::auto_ptr<int> ap2(ap1);
+//	*ap2 = 20;
+//
+//	bite::auto_ptr<int> ap3(new int);
+//	ap3 = ap2;
+//}
+//
+//int main()
+//{
+//	TestFunc();
+//	return 0;
+//}
+
+
+//改进：添加对资源的释放权力
+//namespace bite
+//{
+//	template<class T>
+//	class auto_ptr
+//	{
+//	public:
+//		auto_ptr(T* ptr = nullptr)
+//			:_ptr(ptr)
+//			,_owner(false)
+//		{
+//			if (_ptr)
+//				_owner = true;
+//		}
+//		auto_ptr(const auto_ptr<T>& ap)
+//			:_ptr(ap._ptr)
+//			,_owner(ap._owner)
+//		{
+//			ap._owner = false;
+//		}
+//		auto_ptr<T>& operator=(const auto_ptr<T>& ap)
+//		{
+//			if (this != &ap)
+//			{
+//				if (_ptr && _owner)
+//					delete _ptr;
+//				_ptr = ap._ptr;
+//				_owner = ap._owner;
+//				ap._owner = false;
+//			}
+//			return *this;
+//		}
+//		~auto_ptr()
+//		{
+//			if (_ptr && _owner)
+//				delete _ptr;
+//		}
+//		T& operator*()
+//		{
+//			return *_ptr;
+//		}
+//		T* operator->()
+//		{
+//			return _ptr;
+//		}
+//	private:
+//		T* _ptr;
+//		mutable bool _owner;
+//	};
+//}
+//void TestFunc1()
+//{
+//	bite::auto_ptr<int> ap1(new int);
+//	bite::auto_ptr<int> ap2(ap1);
+//	bite::auto_ptr<int> ap3;
+//	ap3 = ap1;
+//	*ap1 = 10;
+//	*ap2 = 20;
+//	*ap3 = 30;
+//
+//}
+//void TestFunc2()
+//{
+//	//容易形成野指针
+//	bite::auto_ptr<int> ap1(new int);
+//	bite::auto_ptr<int> ap2(ap1);
+//	if (true)
+//	{
+//		bite::auto_ptr<int> ap3(ap2);//出作用域，销毁ap3
+//	}
+//}
+//int main()
+//{
+//	TestFunc2();
+//	return 0;
+//}
