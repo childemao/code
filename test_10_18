@@ -1,0 +1,728 @@
+#include<iostream>
+using namespace std;
+// C++爱好者
+// 在C++11中，更新了几个智能指针的版本
+// 智能指针原理：ARII + 具有指针类似行为 + 解决浅拷贝
+// unique_ptr: 资源独占的方式(一份资源只能被一个对象管理)
+// 方式：禁止拷贝构造和赋值运算符重载调用---防拷贝
+//namespace bite
+//{
+//	template<class T>
+//	class unique_ptr
+//	{
+//	public:
+//		unique_ptr(T* ptr = nullptr)
+//			:_ptr(ptr)
+//		{}
+//		~unique_ptr()
+//		{
+//			if (_ptr)
+//				delete _ptr;
+//		}
+//		T& operator*()
+//		{
+//			return *_ptr;
+//		}
+//		T* operator->()
+//		{
+//			return _ptr;
+//		}
+//		/*
+//		private:
+//		{//防止拷贝构造和赋值运算符的使用
+//			unique_ptr(const unique_ptr<T>& up);
+//			unique_ptr<T>& operator=(const unique_ptr<T>& up);
+//
+//		*/
+//		unique_ptr(const unique_ptr<T>& up) = delete;
+//		unique_ptr<T>& operator=(const unique_ptr<T>& up) = delete;
+//	protected:
+//		T* _ptr;
+//	};
+//}// 缺陷：多个unique_ptr的对象之间不能共享资源
+//void TestFunc()
+//{
+//	bite::unique_ptr<int> up1(new int);
+//
+//	//bite::unique_ptr<int> up2(up1);
+//	bite::unique_ptr<int> up3;
+//	//up2 = up1;
+//}
+//int main()
+//{
+//	TestFunc();
+//	return 0;
+//}
+
+
+//shared_ptr: RAII + 指针类似的行为 + 引用计数
+
+//namespace bite
+//{
+//	template<class T>
+//	class shared_ptr
+//	{
+//	public:
+//		shared_ptr(T* ptr = nullptr)
+//			:_ptr(ptr)
+//			, _count(0)
+//		{
+//			if (_ptr)
+//				_count = 1;
+//		}
+//		shared_ptr(shared_ptr<T>& sp)
+//			:_ptr(sp._ptr)
+//			, _count(++sp._count)
+//		{}
+//		~shared_ptr()
+//		{
+//			if (_ptr && 0 == --_count)
+//			{
+//				delete _ptr;
+//			}
+//		}
+//		T& operator*()
+//		{
+//			return *_ptr;
+//		}
+//
+//		T* operator->()
+//		{
+//			return _ptr;
+//		}
+//	
+//	protected:
+//		T* _ptr;
+//		int _count;
+//	
+//    };
+//}
+//void TestFunc()
+//{
+//	//每个对象都有一个count，sp2释放后，sp2的count变为1；可sp1得count还为2；
+//	//释放不了空间
+//	bite::shared_ptr<int> sp1(new int);
+//	bite::shared_ptr<int> sp2(sp1);
+//	bite::shared_ptr<int> sp3(new int);
+//}
+//int main()
+//{
+//	TestFunc();
+//	return 0;
+//}
+
+
+// 引用计数：静态的成员变量
+//namespace bite
+//{
+//	template<class T>
+//	class shared_ptr
+//	{
+//	public:
+//		shared_ptr(T* ptr = nullptr)
+//			:_ptr(ptr)
+//		{
+//			if (_ptr)
+//				_count = 1;
+//		}
+//		shared_ptr(shared_ptr<T>& sp)
+//			: _ptr(sp._ptr)
+//		{
+//			_count++;
+//		}
+//		~shared_ptr()
+//		{
+//			if (_ptr && 0 == --_count)
+//			{
+//				delete _ptr;
+//			}
+//		}
+//		// 具有指针类似行为
+//		T& operator*()
+//		{
+//			return *_ptr;
+//		}
+//
+//		T* operator->()
+//		{
+//			return _ptr;
+//		}
+//	private:
+//		T* _ptr;
+//		static int _count;
+//	};
+//}
+//	template<class T>
+//	int bite::shared_ptr<T>::_count = 0;
+//void TestFunc()
+//{
+//		//只有一个静态count,
+//		bite::shared_ptr<int> sp1(new int);
+//		bite::shared_ptr<int> sp2(sp1);//此处sp1,sp2的count=2；
+//		bite::shared_ptr<int> sp3(new int);//创建sp3后，count变为1//所以不可行
+//}
+//int main()
+//{
+//		TestFunc();
+//		return 0;
+//}	
+
+//namespace bite
+//{
+//	template<class T>
+//	class shared_ptr
+//	{
+//	public:
+//		shared_ptr(T* ptr = nullptr)
+//			:_ptr(ptr)
+//			, _pCount(nullptr)
+//		{
+//			if (_ptr)
+//				_pCount = new int(1);
+//		}
+//		shared_ptr(const shared_ptr<T>& sp)
+//			:_ptr(sp._ptr)
+//			,_pCount(sp._pCount)
+//		{
+//			if (_pCount)
+//				++* _pCount;
+//		}
+//		shared_ptr<T>& operator=(const shared_ptr<T>& sp)
+//		{
+//			if (this != &sp)
+//			{
+//				Release();
+//				_ptr = sp._ptr;
+//				_pCount = sp._pCount;
+//				if (_pCount)
+//					++* _pCount;
+//			}
+//			return *this;
+//		}
+//		~shared_ptr()
+//		{
+//			Release();
+//		}
+//		T& operator*()
+//		{
+//			return *_ptr;
+//		}
+//
+//		T* operator->()
+//		{
+//			return _ptr;
+//		}
+//		int use_count()
+//		{
+//			return *_pCount;
+//		}
+//	private:
+//		void Release()
+//		{
+//			if (_ptr && 0 == *_pCount)
+//			{
+//				delete _ptr;
+//				delete _pCount;
+//			}
+//		}
+//	protected:
+//		T* _ptr;
+//		int* _pCount;
+//	};
+//}
+//void Testsharedptr()
+//{
+//	bite::shared_ptr<int> sp1(new int);
+//	bite::shared_ptr<int> sp2(sp1);
+//	cout << sp1.use_count() << endl;
+//	cout << sp2.use_count() << endl;
+//
+//	bite::shared_ptr<int> sp3(new int);
+//	bite::shared_ptr<int> sp4(sp3);
+//	cout << sp3.use_count() << endl;
+//	cout << sp4.use_count() << endl;
+//
+//	sp3 = sp1;
+//	cout << sp1.use_count() << endl;
+//	sp4 = sp1;
+//	cout << sp1.use_count() << endl;
+//}
+//int main()
+//{
+//	Testsharedptr();
+//	return 0;
+//}
+
+//#include<mutex>
+//namespace bite
+//{
+//	template<class T>
+//	class shared_ptr
+//	{
+//	public:
+//		shared_ptr(T* ptr = nullptr)
+//			:_ptr(ptr)
+//			, _pCount(nullptr)
+//			, _pMutex(nullptr)
+//		{
+//			if (_ptr)
+//			{
+//				_pMutex = new mutex;
+//				_pCount = new int(1);
+//			}
+//				
+//		}
+//		shared_ptr(const shared_ptr<T>& sp)
+//			:_ptr(sp._ptr)
+//			, _pCount(sp._pCount)
+//			,_pmutex(sp._pMutex)
+//		{
+//			if (_pCount)
+//				AddRef();
+//		}
+//		shared_ptr<T>& operator=(const shared_ptr<T>& sp)
+//		{
+//			if (this != &sp)
+//			{
+//				Release();
+//				_ptr = sp._ptr;
+//				_pCount = sp._pCount;
+//				if (_pCount)
+//					AddRef();
+//			}
+//			return *this;
+//		}
+//		~shared_ptr()
+//		{
+//			Release();
+//		}
+//		T& operator*()
+//		{
+//			return *_ptr;
+//		}
+//
+//		T* operator->()
+//		{
+//			return _ptr;
+//		}
+//		int use_count()
+//		{
+//			return *_pCount;
+//		}
+//	private:
+//		void Release()
+//		{
+//			if (_ptr && 0 == SubRef())
+//			{
+//				delete _ptr;
+//				delete _pCount;
+//			}
+//		}
+//		void AddRef()
+//		{
+//			_pMutex->lock();
+//			++(*_pCount);
+//			_pMutex->nulock();
+//		}
+//		int SubRef()
+//		{
+//			_pMutex->lock();
+//			--(*_pCount);
+//			_pMutex->unlock();
+//
+//			return *_pCount;
+//		}
+//	protected:
+//		T* _ptr;
+//		int* _pCount;
+//		mutex* _pMutex;//保证计数的安全性
+//	};
+//}
+////可以保证计数的安全性 || 可以保证shared_ptr类本身的安全性
+////但不能保证shared_ptr管理资源中内容的安全性
+//void Testsharedptr()
+//{
+//	bite::shared_ptr<int> sp1(new int);
+//	bite::shared_ptr<int> sp2(sp1);
+//	cout << sp1.use_count() << endl;
+//	cout << sp2.use_count() << endl;
+//
+//	bite::shared_ptr<int> sp3(new int);
+//	bite::shared_ptr<int> sp4(sp3);
+//	cout << sp3.use_count() << endl;
+//	cout << sp4.use_count() << endl;
+//
+//	sp3 = sp1;
+//	cout << sp1.use_count() << endl;
+//	sp4 = sp1;
+//	cout << sp1.use_count() << endl;
+//}
+//int main()
+//{
+//	Testsharedptr();
+//	return 0;
+//}
+
+
+// C++爱好者
+// 在C++11中，更新了几个智能指针的版本
+// 智能指针原理：ARII + 具有指针类似行为 + 解决浅拷贝
+// unique_ptr: 资源独占的方式(一份资源只能被一个对象管理)
+// 方式：禁止拷贝构造和赋值运算符重载调用---防拷贝
+//namespace bite
+//{
+//	template<class T>
+//	class unique_ptr
+//	{
+//	public:
+//		unique_ptr(T* ptr = nullptr)
+//			:_ptr(ptr)
+//		{}
+//		~unique_ptr()
+//		{
+//			if (_ptr)
+//				delete _ptr;
+//		}
+//		T& operator*()
+//		{
+//			return *_ptr;
+//		}
+//		T* operator->()
+//		{
+//			return _ptr;
+//		}
+//		/*
+//		private:
+//		{//防止拷贝构造和赋值运算符的使用
+//			unique_ptr(const unique_ptr<T>& up);
+//			unique_ptr<T>& operator=(const unique_ptr<T>& up);
+//
+//		*/
+//		unique_ptr(const unique_ptr<T>& up) = delete;
+//		unique_ptr<T>& operator=(const unique_ptr<T>& up) = delete;
+//	protected:
+//		T* _ptr;
+//	};
+//}// 缺陷：多个unique_ptr的对象之间不能共享资源
+//void TestFunc()
+//{
+//	bite::unique_ptr<int> up1(new int);
+//
+//	//bite::unique_ptr<int> up2(up1);
+//	bite::unique_ptr<int> up3;
+//	//up2 = up1;
+//}
+//int main()
+//{
+//	TestFunc();
+//	return 0;
+//}
+
+
+//shared_ptr: RAII + 指针类似的行为 + 引用计数
+
+//namespace bite
+//{
+//	template<class T>
+//	class shared_ptr
+//	{
+//	public:
+//		shared_ptr(T* ptr = nullptr)
+//			:_ptr(ptr)
+//			, _count(0)
+//		{
+//			if (_ptr)
+//				_count = 1;
+//		}
+//		shared_ptr(shared_ptr<T>& sp)
+//			:_ptr(sp._ptr)
+//			, _count(++sp._count)
+//		{}
+//		~shared_ptr()
+//		{
+//			if (_ptr && 0 == --_count)
+//			{
+//				delete _ptr;
+//			}
+//		}
+//		T& operator*()
+//		{
+//			return *_ptr;
+//		}
+//
+//		T* operator->()
+//		{
+//			return _ptr;
+//		}
+//	
+//	protected:
+//		T* _ptr;
+//		int _count;
+//	
+//    };
+//}
+//void TestFunc()
+//{
+//	//每个对象都有一个count，sp2释放后，sp2的count变为1；可sp1得count还为2；
+//	//释放不了空间
+//	bite::shared_ptr<int> sp1(new int);
+//	bite::shared_ptr<int> sp2(sp1);
+//	bite::shared_ptr<int> sp3(new int);
+//}
+//int main()
+//{
+//	TestFunc();
+//	return 0;
+//}
+
+
+// 引用计数：静态的成员变量
+//namespace bite
+//{
+//	template<class T>
+//	class shared_ptr
+//	{
+//	public:
+//		shared_ptr(T* ptr = nullptr)
+//			:_ptr(ptr)
+//		{
+//			if (_ptr)
+//				_count = 1;
+//		}
+//		shared_ptr(shared_ptr<T>& sp)
+//			: _ptr(sp._ptr)
+//		{
+//			_count++;
+//		}
+//		~shared_ptr()
+//		{
+//			if (_ptr && 0 == --_count)
+//			{
+//				delete _ptr;
+//			}
+//		}
+//		// 具有指针类似行为
+//		T& operator*()
+//		{
+//			return *_ptr;
+//		}
+//
+//		T* operator->()
+//		{
+//			return _ptr;
+//		}
+//	private:
+//		T* _ptr;
+//		static int _count;
+//	};
+//}
+//	template<class T>
+//	int bite::shared_ptr<T>::_count = 0;
+//void TestFunc()
+//{
+//		//只有一个静态count,
+//		bite::shared_ptr<int> sp1(new int);
+//		bite::shared_ptr<int> sp2(sp1);//此处sp1,sp2的count=2；
+//		bite::shared_ptr<int> sp3(new int);//创建sp3后，count变为1//所以不可行
+//}
+//int main()
+//{
+//		TestFunc();
+//		return 0;
+//}	
+
+//namespace bite
+//{
+//	template<class T>
+//	class shared_ptr
+//	{
+//	public:
+//		shared_ptr(T* ptr = nullptr)
+//			:_ptr(ptr)
+//			, _pCount(nullptr)
+//		{
+//			if (_ptr)
+//				_pCount = new int(1);
+//		}
+//		shared_ptr(const shared_ptr<T>& sp)
+//			:_ptr(sp._ptr)
+//			,_pCount(sp._pCount)
+//		{
+//			if (_pCount)
+//				++* _pCount;
+//		}
+//		shared_ptr<T>& operator=(const shared_ptr<T>& sp)
+//		{
+//			if (this != &sp)
+//			{
+//				Release();
+//				_ptr = sp._ptr;
+//				_pCount = sp._pCount;
+//				if (_pCount)
+//					++* _pCount;
+//			}
+//			return *this;
+//		}
+//		~shared_ptr()
+//		{
+//			Release();
+//		}
+//		T& operator*()
+//		{
+//			return *_ptr;
+//		}
+//
+//		T* operator->()
+//		{
+//			return _ptr;
+//		}
+//		int use_count()
+//		{
+//			return *_pCount;
+//		}
+//	private:
+//		void Release()
+//		{
+//			if (_ptr && 0 == *_pCount)
+//			{
+//				delete _ptr;
+//				delete _pCount;
+//			}
+//		}
+//	protected:
+//		T* _ptr;
+//		int* _pCount;
+//	};
+//}
+//void Testsharedptr()
+//{
+//	bite::shared_ptr<int> sp1(new int);
+//	bite::shared_ptr<int> sp2(sp1);
+//	cout << sp1.use_count() << endl;
+//	cout << sp2.use_count() << endl;
+//
+//	bite::shared_ptr<int> sp3(new int);
+//	bite::shared_ptr<int> sp4(sp3);
+//	cout << sp3.use_count() << endl;
+//	cout << sp4.use_count() << endl;
+//
+//	sp3 = sp1;
+//	cout << sp1.use_count() << endl;
+//	sp4 = sp1;
+//	cout << sp1.use_count() << endl;
+//}
+//int main()
+//{
+//	Testsharedptr();
+//	return 0;
+//}
+
+//#include<mutex>
+//namespace bite
+//{
+//	template<class T>
+//	class shared_ptr
+//	{
+//	public:
+//		shared_ptr(T* ptr = nullptr)
+//			:_ptr(ptr)
+//			, _pCount(nullptr)
+//			, _pMutex(nullptr)
+//		{
+//			if (_ptr)
+//			{
+//				_pMutex = new mutex;
+//				_pCount = new int(1);
+//			}
+//				
+//		}
+//		shared_ptr(const shared_ptr<T>& sp)
+//			:_ptr(sp._ptr)
+//			, _pCount(sp._pCount)
+//			,_pmutex(sp._pMutex)
+//		{
+//			if (_pCount)
+//				AddRef();
+//		}
+//		shared_ptr<T>& operator=(const shared_ptr<T>& sp)
+//		{
+//			if (this != &sp)
+//			{
+//				Release();
+//				_ptr = sp._ptr;
+//				_pCount = sp._pCount;
+//				if (_pCount)
+//					AddRef();
+//			}
+//			return *this;
+//		}
+//		~shared_ptr()
+//		{
+//			Release();
+//		}
+//		T& operator*()
+//		{
+//			return *_ptr;
+//		}
+//
+//		T* operator->()
+//		{
+//			return _ptr;
+//		}
+//		int use_count()
+//		{
+//			return *_pCount;
+//		}
+//	private:
+//		void Release()
+//		{
+//			if (_ptr && 0 == SubRef())
+//			{
+//				delete _ptr;
+//				delete _pCount;
+//			}
+//		}
+//		void AddRef()
+//		{
+//			_pMutex->lock();
+//			++(*_pCount);
+//			_pMutex->nulock();
+//		}
+//		int SubRef()
+//		{
+//			_pMutex->lock();
+//			--(*_pCount);
+//			_pMutex->unlock();
+//
+//			return *_pCount;
+//		}
+//	protected:
+//		T* _ptr;
+//		int* _pCount;
+//		mutex* _pMutex;//保证计数的安全性
+//	};
+//}
+////可以保证计数的安全性 || 可以保证shared_ptr类本身的安全性
+////但不能保证shared_ptr管理资源中内容的安全性
+//void Testsharedptr()
+//{
+//	bite::shared_ptr<int> sp1(new int);
+//	bite::shared_ptr<int> sp2(sp1);
+//	cout << sp1.use_count() << endl;
+//	cout << sp2.use_count() << endl;
+//
+//	bite::shared_ptr<int> sp3(new int);
+//	bite::shared_ptr<int> sp4(sp3);
+//	cout << sp3.use_count() << endl;
+//	cout << sp4.use_count() << endl;
+//
+//	sp3 = sp1;
+//	cout << sp1.use_count() << endl;
+//	sp4 = sp1;
+//	cout << sp1.use_count() << endl;
+//}
+//int main()
+//{
+//	Testsharedptr();
+//	return 0;
+//}
