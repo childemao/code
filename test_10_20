@@ -1,0 +1,37 @@
+#include<iostream>
+using namespace std;
+#include<string>
+#include<map>
+
+void TestMap1()
+{
+	map<string, string> m;
+	m.insert(pair<string, string>("李逵", "黑旋风"));
+	m.insert(make_pair("林冲", "豹子头"));
+	m.insert(make_pair("宋江", "及时雨"));
+	m.insert(make_pair("孙二娘", "母夜叉"));
+
+	cout << m.size() << endl;
+	auto it = m.begin();
+	while (it != m.end())
+	{
+		cout << it->first << "<--->" << it->second << endl;
+		++it;
+	}
+	cout << endl;
+
+	m.insert(make_pair("李逵", "铁牛"));
+	for (auto& e : m)
+		cout << e.first << "<--->" << e.second << endl;
+	cout << endl;
+
+	cout << m["宋江"] << endl;
+	cout << m["武松"] << endl;
+	m["鲁达"] = "花和尚";
+	// <"鲁达"，"">
+}
+int main()
+{
+	TestMap1();
+	return 0;
+}
