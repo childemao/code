@@ -1,0 +1,198 @@
+#include<iostream>
+using namespace std;
+
+
+template<class T>
+struct BSTreeNode
+{
+	BSTreeNode(const T& date = T())
+		:_pLeft(nullptr)
+		,_pRight(nullptr)
+		,_date(date)
+	{}
+
+	BSTreeNode<T>* _pLeft;
+	BSTreeNode<T>* _pRight;
+	T _date;
+};
+
+template<class T>
+class BSTree
+{
+	typedef BSTreeNode<T> Node;
+public:
+	BSTree()
+		:_pRoot(nullptr)
+	{}
+	bool Insert(const T& date)
+	{
+		if (nullptr == _pRoot)
+			_pRoot = new Node(date);
+
+		Node* pCur = _pRoot;
+		Node* pParent = nullptr;
+		while (pCur)
+		{
+			pParent = pCur;
+			if (date < pCur->_date)
+				pCur = pCur->_pLeft;
+			else if (date > pCur->_date)
+				pCur = pCur->_pRight;
+			else
+				return false;
+		}
+		pCur = new Node(date);
+		if (date < pParent->_date)
+			pParent->_pLeft = pCur;
+		else
+			pParent->_pRight = pCur;
+		return true;
+	}
+	bool Delete(const T& date)
+	{
+		if (nullptr == _pRoot)
+			return false;
+
+		Node* pCur = _pRoot;
+		Node* pParent = nullptr;
+		while (pCur)
+		{
+			if (date == pCur->_date)
+				break;
+			else if (date < pCur->_date)
+			{
+				pParent = pCur;
+				pCur = pCur->_pLeft;
+			}
+			else
+			{
+				pParent = pCur;
+				pCur = pCur->_pLeft;
+			}
+		}
+		//该节点不在二叉搜索树中
+		if (nullptr == pCur)
+			return false;
+		//在树中，删除
+		//1.只有右孩子
+		if (nullptr == pCur->_pLeft)
+		{
+			//根结点
+			if (nullptr == pParent)
+				_pRoot = pCur->_pRight;
+			else
+			{
+				if (pCur == pParent->_pLeft)
+					pParent->_pLeft = pCur->_pRight;
+				else
+					pParent->_pRight = pCur->_pRight;
+			}
+	}
+		else if (nullptr == pCur->pRight)
+		{
+			//只有左孩子
+			if (nullptr == pParent)
+				_pRoot = pCur->_pLeft;
+			else
+			{
+				if (pCur == pParent->_pLeft)
+					pParent->_pLeft = pCur->_pLeft;
+				else
+					pParent->_pRight = pCur->_pLeft;
+			}
+		}
+		else
+		{
+			//左右孩子均存在
+			Node* pDelNode = pCur->_pRight;
+			pParent = pCur;
+			//找替代节点：在右子树中找最小（在最左边）
+			while (pDelNode->_pLeft)
+			{
+				pParent = pDelNode;
+				pDelNode = pDelNode->_pLeft;
+			}
+			//用替代点中值域替换删除节点
+			pCur->_date = pDelNode->_data;
+
+
+			if (pDelNode == pParent->_pLeft)
+				pParent->_pLeft = pDelNode->_pRight;
+			else
+				pParent->_pRight = pDelNode;
+
+			pCur = pDelNode;
+		}
+		delete pCur;
+		return true;
+		}
+	Node* Find(const T& date)
+	{
+		Node* pCur = _pRoot;
+		while (pCur)
+		{
+			if (data == pCur->_date)
+				return pCur;
+			else if (date < pCur->_date)
+				pCur = pCur->_pLeft;
+			else
+				pCur = pCur->_pRight;
+		}
+		return nullptr;
+	}
+	Node* LeftMost()
+	{
+		if (nullptr == _pRoot)
+			return nullptr;
+
+		Node* pCur = _pRoot;
+		while (pCur->_pLeft)
+			pCur = pCur->_pLeft;
+
+		return pCur;
+	}
+	Node* RightMost()
+	{
+		if (nullptr == _pRoot)
+			return nullptr;
+
+		Node* pCur = _pRoot;
+		while (pCur->_pRight)
+			pCur = pCur->_pRight;
+
+		return pCur;
+	}
+	void InOrder()
+	{
+		_InOrder(_pRoot);
+	}
+private:
+	void _InOrder(Node* pRoot)
+	{
+		if (pRoot)
+		{
+	     	_InOrder(pRoot->_pLeft);
+			cout << pRoot->_date << " ";
+			_InOrder(pRoot->_pRight);
+		}
+	}
+private:
+	Node* _pRoot;
+};
+
+void TestBSTree()
+{
+	int a[] = { 5,4,2,3,7,9,8,6,1,0 };
+	BSTree<int> bst;
+	for (auto e : a)
+		bst.Insert(e);
+
+	cout << bst.LeftMost()->_date << endl;
+	cout << bst.RightMost()->_date << endl;
+	bst.InOrder();
+}
+int main()
+{
+	TestBSTree();
+	return 0;
+}
