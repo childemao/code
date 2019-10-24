@@ -1,0 +1,95 @@
+
+#include<iostream>
+using namespace std;
+template<class T>
+struct AVLTreeNode
+{
+	AVLTreeNode(const T& date)
+		:_pLeft(nullptr)
+		,_pRight(nullptr)
+		,_pParent(nullptr)
+		,_date(date)
+		,_bf(0)
+	{}
+	
+	AVLTreeNode<T>* _pLeft;
+	AVLTreeNode<T>* _pRight;
+	AVLTreeNode<T>* _pParent;
+	T _date;
+	int _bf;
+};
+
+template<class T>
+class BSTree
+{
+public:
+	typedef AVLTreeNode<T> Node;
+	BSTree()
+		:_pRoot(nullptr)
+	{}
+	~BSTree()
+	{}
+
+	bool Insert(const T& date)
+	{
+		if (nullptr == _pRoot)
+			_pRoot = new Node(date);
+		Node* pCur = _pRoot;
+		Node* pParent = nullptr;
+		while (pCur)
+		{
+			pParent = pCur;
+			if (date < pCur->_date)
+				pCur = pCur->_pLeft;
+			else if (date > pCur->_date)
+				pCur = pCur->_pRight;
+			else
+				return false;
+		}
+		pCur = new Node(date);
+		if (date < pParent->_date)
+			pParent->_pLeft = pCur;
+		else
+			pParent->_pRight = pCur;
+		return true;
+	}
+	//左旋转
+	void Rotate(Node* pParent)
+	{
+		Node* pSubR = pParent->_pRight;
+		Node* pSubRL = pSubR->_pLeft;
+
+		pParent->_pRight = pSubRL;
+		if (pSubRL)
+			pSubRL->_pParent = pParent;
+
+		pSubR->_pLeft = pParent;
+		Node* pPParent = pParent->_pParent;
+		pParent->_pParent = pSubR;
+		pSubR->_pParent = pPParent;
+
+		if (nullptr == pPParent)
+			_pRoot = pSubR;
+		else
+		{
+			if (pParent == pPParent->_pLeft)
+				pPParent->_pLeft = pSubR;
+			else
+				pPParent->_pRight = pSubR;
+		}
+		pParent->_bf = pSubR->_bf = 0;
+	}
+
+
+private:
+	Node* _pRoot;
+};
+
+int main()
+{
+	int a[] = { 5,4,2,3,7,9,8,6,1,0 };
+	BSTree<int> bst;
+	for (auto e : a)
+		bst.Insert(e);
+	return 0;
+}
