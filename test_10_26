@@ -1,0 +1,23 @@
+#include<iostream>
+using namespace std;
+enum Color
+{
+	RED,
+	BLACK
+};
+template<class T>
+struct RBTeeNode
+{
+	PBTeeNode(const T& date = T(), Color color = RED)
+		:_pLeft(nullptr)
+		, _pRight(nullptr)
+		, _pParent(nullptr)
+		, _date(date)
+		, _color(color)
+	{}
+	RBTeeNode<T>* _pLeft;
+	RBTeeNode<T>* _pRight;
+	RBTeeNode<T>* _pParent;
+	T _date;
+	Color _color;
+};
