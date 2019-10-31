@@ -1,0 +1,396 @@
+#pragma once
+#include<iostream>
+using namespace std;
+
+enum Color
+{RED,BLACK};
+
+template<class T>
+struct RBTreeNode
+{
+	RBTreeNode(const T& data = T(),Color color = RED)
+		:_pLeft(nullptr)
+		,_pRight(nullptr)
+		,_pParent(nullptr)
+		,_data(data)
+		,_color(color)
+	{}
+	RBTreeNode<T>* _pLeft;
+	RBTreeNode<T>* _pRight;
+	RBTreeNode<T>* _pParent;
+	T _data;
+	Color _color;
+};
+template<class T>
+struct RBTreeIterator
+{
+	typedef RBTreeNode<T> Node;
+	typedef RBTreeIterator<T> Self;
+	RBTreeIterator(Node* pNode)
+		:_pNode(pNode)
+	{}
+	T& operator*()
+	{
+		return _pNode->_data;
+	}
+	T* operator->()
+	{
+		return &(operator*());
+	}
+	Self& operator++()//前置++
+	{
+		Increament();
+		return *this;
+	}
+	Self operator++(int)
+	{
+		Self temp(*this);
+		Increament();
+		return temp;
+	}
+	Self& operator--()//前置--
+	{
+		DeIncreament();
+		return *this;
+	}
+	Self operator--(int)
+	{
+		Self temp(*this);
+		DeIncreament();
+		return *this;
+	}
+	bool operator!=(const Self& s)const
+	{
+		return _pNode != s._pNode;
+	}
+	bool operator==(const Self& s)const
+	{
+		return _pNode == s._pNode;
+	}
+
+private:
+	void Increament()
+	{
+		if (_pNode->_pRight)
+		{
+			_pNode = _pNode->_pRight;
+			while (_pNode->_pLeft)
+				_pNode = _pNode->_pLeft;
+		}
+		else
+		{
+			Node* pParent = _pNode->_pParent;
+			while (_pNode == pParent->_pRight)
+			{
+				_pNode = pParent;
+				pParent = _pNode->_pParent;
+			}
+			if (_pNode->_pRight != pParent)
+				_pNode = pParent;
+		}
+	}
+	void DeIncreament()
+	{
+		if (_pNode->_pParent->_pParent == _pNode && _pNode->_color == RED)
+			_pNode = _pNode->_pRight;
+		else if (_pNode->_pLeft)
+		{
+			_pNode = _pNode->_pLeft;
+			while (_pNode->_pRight)
+				_pNode = _pNode->_pRight;
+
+		}
+		else
+		{
+			Node* pParent = _pNode->_pParent;
+			while (pParent->_pLeft == _pNode)
+			{
+				_pNode = pParent;
+				pParent = _pNode->_pParent;
+			}
+			_pNode = pParent;
+		}
+	}
+	Node* _pNode;
+};
+template<class T>
+class RBTree
+{
+	typedef RBTreeNode<T> Node;
+public:
+	typedef RBTreeIterator<T> iterator;
+public:
+	RBTree()
+	{
+		_pHead = new Node;
+		_pHead->_pLeft = _pHead;
+		_pHead->_pRight = _pHead;
+	}
+	bool Insert(const T& data)
+	{
+		Node* & pRoot = GetRoot();
+		if (nullptr == pRoot)
+		{
+			pRoot = new Node(data,BLACK);
+			pRoot->_pParent = _pHead;
+			return true;
+		}
+		else
+		{
+			Node* pCur = pRoot;
+			Node* pParent = nullptr;
+			while (pCur)
+			{
+				pParent = pCur;
+				if (data < pCur->_data)
+					pCur = pCur->_pLeft;
+				else if (data > pCur->_data)
+					pCur = pCur->_pRight;
+				else
+					return false;
+
+			}
+			pCur = new Node(data);
+			if (data < pParent->_data)
+				pParent->_pLeft = pCur;
+			else
+				pParent->_pRight = pCur;
+
+			pCur->_pParent = pParent;
+
+			while (pParent != _pHead && pParent->_color == RED)
+			{
+				Node* grandFather = pParent->_pParent;
+				if (pParent == grandFather->_pLeft)
+				{
+					Node* uncle = grandFather->_pRight;
+					if (uncle && RED == uncle->_color)
+					{
+						pParent->_color = BLACK;
+						uncle->_color = BLACK;
+						grandFather->_color = RED;
+						pCur = grandFather;
+						pParent = pCur->_pParent;
+					}
+					else
+					{
+						if (pCur == pParent->_pRight)
+						{
+							RotateL(pParent);
+							swap(pCur, pParent);
+						}
+						pParent->_color = BLACK;
+						grandFather->_color = RED;
+						RotateR(grandFather);
+					}
+				}
+				else
+				{
+					Node* uncle = grandFather->_pLeft;
+					if (uncle && RED == uncle->_color)
+					{
+						pParent->_color = BLACK;
+						uncle->_color = BLACK;
+						grandFather->_color = RED;
+						pCur = grandFather;
+						pParent = pCur->_pParent;
+					}
+					else
+					{
+						if (pCur == pParent->_pLeft)
+						{
+							RotateR(pParent);
+							swap(pCur, pParent);
+						}
+						pParent->_color = BLACK;
+						grandFather->_color = RED;
+						RotateL(grandFather);
+					}
+				}
+			}
+		}
+		pRoot->_color = BLACK;
+		_pHead->_pLeft = LeftMost();
+		_pHead->_pRight = RightMost();
+		return true;
+	}
+	Node*& GetRoot()
+	{
+		return _pHead->_pParent;
+	}
+	void InOrder()
+	{
+		_InOrder(GetRoot());
+	}
+	Node* LeftMost()
+	{
+		Node* pRoot = GetRoot();
+		if (nullptr == pRoot)
+			return _pHead;
+
+		Node* pCur = pRoot;
+		if (pCur->_pLeft)
+			pCur = pCur->_pLeft;
+
+		return pCur;
+	}
+	Node* RightMost()
+	{
+		Node* pRoot = GetRoot();
+		if (nullptr == pRoot)
+			return _pHead;
+
+		Node* pCur = pRoot;
+		if (pCur->_pRight)
+			pCur = pCur->_pRight;
+
+		return pCur;
+	}
+	iterator Begin()
+	{
+		return iterator(LeftMost());
+	}
+	iterator End()
+	{
+		return iterator(_pHead);
+	}
+	bool IsValidRBTRee()
+	{
+		Node* pRoot = GetRoot();
+		if (nullptr == pRoot)
+			return true;
+		if (pRoot->_color == RED)
+		{
+			cout<< "违反性质一：根节点是黑色" << endl;
+			return false;
+		}
+		size_t blackCount = 0;
+		Node* pCur = pRoot;
+		while (pCur)
+		{
+			if (pCur->_color == BLACK)
+				blackCount++;
+			pCur = pCur->_pLeft;
+
+		}
+		size_t pathBlack = 0;
+		return _IsValidRBTRee(pRoot, blackCount, pathBlack);
+	}
+private:
+	bool _IsValidRBTRee(Node* pRoot, size_t blackCount, size_t pathBlack)
+	{
+		if (nullptr == pRoot)
+			return true;
+		if (pRoot->_color == BLACK)
+			pathBlack++;
+		Node* pParent = pRoot->_pParent;
+		if (pParent != _pHead && RED == pRoot->_color
+			&& RED == pParent->_color)
+		{
+			cout << "违反性质3：不能存在连在一起的红色节点" << endl;
+			return false;
+		}
+		if (nullptr == pRoot->_pLeft && nullptr == pRoot->_pRight)
+		{
+
+			if (pathBlack != blackCount)
+			{
+				cout << "违反性质4：每条路径中黑色节点个数均相同" << endl;
+				return false;
+			}
+		}
+		return _IsValidRBTRee(pRoot->_pLeft, blackCount, pathBlack) &&
+			_IsValidRBTRee(pRoot->_pRight, blackCount, pathBlack);
+	}
+	void _InOrder(Node* pRoot)
+	{
+		if (pRoot)
+		{
+			_InOrder(pRoot->_pLeft);
+			cout << pRoot->_data << " ";
+			_InOrder(pRoot->_pRight);
+
+		}
+	}
+	void RotateL(Node* pParent)
+	{
+		Node* pSubR = pParent->_pRight;
+		Node* pSubRL = pSubR->_pLeft;
+
+		pParent->_pRight = pSubRL;
+		if (pSubRL)
+			pSubRL->_pParent = pParent;
+		pSubR->_pLeft = pParent;
+		Node* pPParent = pParent->_pParent;
+		pParent->_pParent = pSubR;
+		pSubR->_pParent = pPParent;
+		if (_pHead == pPParent)
+			_pHead->_pParent = pSubR;
+		else
+		{
+			if (pParent == pPParent->_pLeft)
+			{
+				pPParent->_pLeft = pSubR;
+			}
+			else
+				pPParent->_pRight = pSubR;
+		}
+	}
+	void RotateR(Node* pParent)
+	{
+		Node* pSubL = pParent->_pLeft;
+		Node* pSubLR = pSubL->_pRight;
+
+		pParent->_pLeft = pSubLR;
+		if (pSubLR)
+			pSubLR->_pParent = pParent;
+
+		pSubL->_pRight = pParent;
+
+		Node* pPParent = pParent->_pParent;
+		pParent->_pParent = pSubL;
+		pSubL->_pParent = pPParent;
+
+		if (pPParent == _pHead)
+			_pHead->_pParent = pSubL;
+		else
+		{
+			if (pParent == pPParent->_pLeft)
+				pPParent->_pLeft = pSubL;
+			else
+				pPParent->_pRight = pSubL;
+		}
+	}
+
+
+private:
+	Node* _pHead;
+};
+int main()
+{
+	int a[] = { 1,5,4,2,8,7,9,6,3,0 };
+	RBTree<int> t;
+	for (auto e : a)
+	{
+		t.Insert(e);
+	}
+	t.InOrder();
+	cout << endl;
+
+	cout << t.LeftMost()->_data << endl;
+	cout << t.RightMost()->_data << endl;
+
+	if (t.IsValidRBTRee())
+		cout << "t is RBTree" << endl;
+	else
+		cout << "t is not RBTree" << endl;
+
+	auto it = t.Begin();
+	while (it != t.End())
+	{
+		cout << *it << " ";
+		++it;
+	}
+	cout << endl;
+
+}
