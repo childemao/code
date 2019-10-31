@@ -229,7 +229,7 @@ public:
 			return _pHead;
 
 		Node* pCur = pRoot;
-		if (pCur->_pLeft)
+		while (pCur->_pLeft)
 			pCur = pCur->_pLeft;
 
 		return pCur;
@@ -241,7 +241,7 @@ public:
 			return _pHead;
 
 		Node* pCur = pRoot;
-		if (pCur->_pRight)
+		while(pCur->_pRight)
 			pCur = pCur->_pRight;
 
 		return pCur;
