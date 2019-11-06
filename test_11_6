@@ -1,0 +1,221 @@
+//#include<iostream>
+//using namespace std;
+//
+//template<class T>
+//struct BSTreeNode
+//{
+//	BSTreeNode(const T& data = T())
+//		:_pLeft(nullptr)
+//		,_pRight(nullptr)
+//		,_data(data)
+//	{}
+//	BSTreeNode<T>* _pLeft;
+//	BSTreeNode<T>* _pRight;
+//	T _data;
+//};
+//template<class T>
+//class BSTree
+//{
+//	typedef BSTreeNode<T> Node;
+//public:
+//	BSTree()
+//		:_pRoot(nullptr)
+//	{}
+//	bool Insert(const T& data)
+//	{
+//		if (nullptr == _pRoot)
+//		{
+//			_pRoot = new Node(data);
+//		}
+//		Node* pCur = _pRoot;
+//		Node* pParent = nullptr;
+//		while (pCur)
+//		{
+//			//保存母亲节点，最后会插入母亲节点的左右。
+//			pParent = pCur;
+//			if (data < pCur->_data)
+//				pCur = pCur->_pLeft;
+//			else if (data > pCur->_data)
+//				pCur = pCur->_pRight;
+//			else
+//				return false;
+//		}
+//		pCur = new Node(data);
+//		if (data < pParent->_data)
+//			pParent->_pLeft = pCur;
+//		else
+//			pParent->_pRight = pCur;
+//
+//		return true;
+//	}
+//	bool Delete(const T& data)
+//	{
+//		if (nullptr == _pRoot)
+//			return false;
+//		Node* pCur = _pRoot;
+//		Node* pParent = nullptr;
+//		while (pCur)
+//		{
+//			if (data == pCur->_data)
+//				break;
+//			else if (data < pCur->_data)
+//			{
+//				pParent = pCur;
+//				pCur = pCur->_pLeft;
+//			}
+//			else
+//			{
+//				pParent = pCur;
+//				pCur = pCur->_pRight;
+//			}
+//		}
+//		//判断是否找到节点
+//		if (nullptr == pCur)
+//			return false;
+//		//找到要删除的节点
+//		//要删除的节点只有右孩子
+//		if (nullptr == pCur->_pLeft)
+//		{
+//			//删除节点为根节点
+//			if (nullptr == pParent)
+//				_pRoot = pCur->_pRight;
+//			else
+//			{
+//				if (pCur == pParent->_pLeft)
+//					pParent->_pLeft = pCur->_pRight;
+//				else
+//					pParent->_pRight = pCur->_pRight;
+//			}
+//		}
+//		//删除的节点只有左孩子
+//		else if (nullptr == pCur->_pRight)
+//		{//删除节点为根节点
+//			if (nullptr == pParent)
+//				_pRoot = pCur->_pLeft;
+//			else
+//			{
+//				if (pCur == pParent->_pLeft)
+//					pParent->_pLeft = pCur->_pLeft;
+//				else
+//					pParent->_pRight = pCur->_pLeft;
+//			}
+//		}
+//		else
+//			//要删除的节点左右孩子都有
+//		{
+//			//找替代节点
+//			Node* pDelNode = pCur->_pRight;
+//			pParent = pCur;
+//			//在右子树中找最小的(即右子树中最小的)
+//			while (pDelNode->_pLeft)
+//			{
+//				pParent = pDelNode;
+//				pDelNode = pDelNode->_pLeft;
+//			}
+//			pCur->_data = pDelNode->_data;
+//			if (pDelNode == pParent->_pLeft)
+//				pParent->_pLeft = pDelNode->_pRight;
+//			else
+//				pParent->_pRight = pDelNode->_pRight;
+//
+//			pCur = pDelNode;	
+//		}
+//		delete pCur;
+//		return true;
+//	}
+//	Node* Find(const T& data)
+//	{
+//		Node* pCur = _pRoot;
+//		while (pCur)
+//		{
+//			if (data == pCur->_data)
+//				return pCur;
+//			else if (data > pCur->_data)
+//				pCur = pCur->_pRight;
+//			else
+//				pCur = pCur->_pLeft;
+//		}
+//		return nullptr;
+//	}
+//	Node* LeftMost()
+//	{
+//		if (nullptr == _pRoot)
+//			return nullptr;
+//		Node* pCur = _pRoot;
+//		while (pCur->_pLeft)
+//			pCur = pCur->_pLeft;
+//
+//		return pCur;
+//	}
+//	Node* RightMost()
+//	{
+//		if (nullptr == _pRoot)
+//			return nullptr;
+//		Node* pCur = _pRoot;
+//		while (pCur->_pRight)
+//			pCur = pCur->_pRight;
+//
+//		return pCur;
+//	}
+//	void InOrder()
+//	{
+//		_InOrder(_pRoot);
+//	}
+//private:
+//	void _InOrder(Node* pRoot)
+//	{
+//		if (pRoot)
+//		{
+//			_InOrder(pRoot->_pLeft);
+//			cout << pRoot->_data << " ";
+//			_InOrder(pRoot->_pRight);
+//		}
+//	}
+//private:
+//	Node* _pRoot;
+//};
+//
+//void TestBSTree()
+//{
+//	int a[] = { 5, 3, 4, 1, 7, 8, 2, 6, 0, 9 };
+//	BSTree<int> bst;
+//	for (auto e : a)
+//	{
+//		bst.Insert(e);
+//	}
+//	cout << bst.LeftMost()->_data << endl;
+//	cout << bst.RightMost()->_data << endl;
+//	bst.InOrder();
+//	cout << endl;
+//	cout << bst.Find(5)->_data << endl;
+//}
+//int main()
+//{
+//	TestBSTree();
+//	return 0;
+//}
+
+#include<iostream>
+using namespace std;
+#include<string>
+
+int main()
+{
+	string s1;
+	string s2;
+	string s3;
+	size_t count[256] = { 0 };
+	getline(cin, s1);
+	getline(cin, s2);
+	for (size_t i = 0; i < s2.size(); ++i)
+	{
+		count[s2[i]]++;
+	}
+	for (size_t i = 0; i < s1.size(); ++i)
+	{
+		if (count[s1[i]] == 0)
+			s3 += s1[i];
+	}
+	cout << s3;
+	return 0;
+}
