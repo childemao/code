@@ -1,0 +1,33 @@
+/*删除公共字符
+输入两个字符串，从第一字符串中删除第二个字符串中所有的字符。
+例如，输入”They are students.”和”aeiou”，
+则删除之后的第一个字符串变成”Thy r stdnts.”
+输入描述： 每个测试输入包含2个字符串 
+输出描述： 输出删除后的字符串 
+示例1 : 输入They are students.aeiou 
+输出Thy r stdnts.
+*/
+#include<iostream>
+using namespace std;
+#include<string>
+
+int main()
+{
+	string s1, s2;
+	getline(cin, s1);
+	getline(cin, s2);
+	string s3;
+	int count[256] = { 0 };
+	for (int i = 0; i < s2.size(); ++i)
+	{
+		count[s2[i]]++;
+	}
+	for (int j = 0; j < s1.size(); ++j)
+	{
+		if (count[s1[j]] == 0)
+			s3 += s1[j];
+	}
+	cout << s3 << endl;
+
+	return 0;
+}
