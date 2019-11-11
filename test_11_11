@@ -1,0 +1,269 @@
+#include<iostream>
+using namespace std;
+#include<vector>
+#include"Common.cpp"
+
+template<class T>
+struct HBNode
+{
+	HBNode(const T& data = T())
+		:_data(data)
+		,_pNext(nullptr)
+	{}
+	
+	T _data;
+	HBNode<T>* _pNext;
+};
+
+template<class T>
+struct T2IntDef
+{
+	T operator()(const T& data)
+	{
+		return data;
+	}
+};
+//T 是其他类型：需要用户给出转化的方式
+struct String2INT
+{
+	size_t operator()(const string& s)
+	{
+		return (size_t)(s.c_str);
+	}
+};
+
+template<class T, class T2Int>
+class HashBucket;
+
+template<class T, class T2Int = T2IntDef<T>>
+struct HBIterator
+{
+	typedef HBNode<T> Node;
+	typedef HBIterator<T, T2Int> Self;
+	typedef HashBucket<T, T2Int> HB;
+	HBIterator(HB* ht = nullptr, Node* pNode = nullptr)
+		:_pNode(pNode)
+		,_ht(ht)
+	{}
+
+	T& operator*()
+	{
+		return _pNode->_data;
+	}
+	T* operator->()
+	{
+		return (&operator*());
+	}
+
+	Self& operator++()
+	{
+		Next();
+		return *this;
+	}
+	Self operator++(int)
+	{
+		Self temp(*this);
+		Next();
+		return temp;
+	}
+
+	bool operator!=(const Self& s)const
+	{
+		return _pNode != s._pNode;
+	}
+
+	bool operator==(const Self& s)const
+	{
+		return _pNode == s._pNode;
+	}
+	void Next()
+	{
+		if (_pNode->_data)
+		{
+			_pNode = _pNode->_pNext;
+		}
+		else
+		{
+			size_t bucketNo = _ht->Hashfunc(_pNode->data) + 1;
+
+			for (; bucketNo < _ht->BucketCount(); ++bucketNo)
+			{
+				_pNode = _ht->_table[bucketNo];
+				if (_pNode)
+					return;
+			}
+		}
+	}
+	Node* _pNode;
+	HB* _ht;
+};
+
+template<class T, class T2Int>
+class HashBucket
+{
+	friend struct HBIterator<T, T2Int>;
+
+	typedef HBNode<T> Node;
+	typedef HashBucket<T, T2Int> Self;
+public:
+	typedef HBIterator<T, T2Int> iterator;
+public:
+	HashBucket(size_t capacity = 10)
+		:_table(GetNextPrime(capacity))
+		,_size(0)
+	{}
+
+	bool Insert(const T& data)
+	{
+		size_t bucketNo = HashFunc(data);
+
+		Node* pCur = _table[bucketNo];
+		while (pCur)
+		{
+			if (pCur->_data == data)
+				return false;
+			pCur = pCur->_pNext;
+		}
+		pCur = new Node(data);
+		pCur->_pNext = _table[bucketNo];
+		_table[bucketNo] = pCur;
+		++_size;
+		return true;
+	}
+
+	Node* find(const T& data)
+	{
+		size_t bucketNo = HashFunc(data);
+		Node* pCur = _table[bucketNo];
+		while (pCur)
+		{
+			if (data == pCur->_data)
+				return pCur;
+			pCur = pCur->_pNext;
+		}
+		return nullptr;
+	}
+	bool Erase(const T& data)
+	{
+	    size_t bucketNo = HashFunc(data);
+		Node* pCur = _table[bucketNo];
+		Node* pPre = nullptr;
+		while (pCur)
+		{
+			if (data == pCur->_data)
+			{
+				if (_table[bucketNo] == pCur)
+				{
+					_table[bucketNo] = pCur->_pNext;
+				}
+				else
+				{
+					pPre->_pNext = pCur->_pNext;
+				}
+				delete pCur;
+				--size;
+				return true;
+			}
+			pPre = pCur;
+			pCur = pCur->_pNext;
+		}
+		return false;
+	}
+	iterator Begin()
+	{
+		for (size_t i = 0; i < _table.capacity(); ++i)
+		{
+			if (_table[i])
+				return iterator(this, _table[i]);
+		}
+		return End();
+	}
+	iterator End()
+	{
+		return iterator(this, nullptr);
+	}
+
+	void Swap(Self& ht)
+	{
+		_table.swap(ht._table);
+		swap(_size, ht._size);
+	}
+	size_t BucketCount()const
+	{
+		return _table.capacity();
+	}
+	void CheckCapacity()
+	{
+		if (_size == _table.capacity())
+		{
+			Self ht(GetNextPrime(_size));
+			for (size_t i = 0; i < _table.capacity(); ++i)
+			{
+				Node* pCur = _table[i];
+				while (pCur)
+				{
+					_table[i] = pCur->_pNext;
+					size_t bucketNo = ht.HashFunc(pCur->_data);
+					pCur->_pNext = ht._table[bucketNo];
+					ht._table[bucketNo] = pCur;
+				}
+			}
+			this->Swap(ht);
+		}
+	}
+	void PrintHashBucket()
+	{
+		for (size_t i = 0; i < _table.capacity(); ++i)
+		{
+			cout << "_table[" << i << "]:";
+
+			Node* pCur = _table[i];
+			while (pCur)
+			{
+				cout << pCur->_data << "--->";
+				pCur = pCur->_pNext;
+			}
+
+			cout << "NULL" << endl;
+		}
+		cout << endl;
+	}
+private:
+	size_t HashFunc(const T& data)
+	{
+		return T2Int()(data) % _table.capacity();
+	}
+private:
+	vector<Node*> _table;
+	size_t _size;
+};
+
+int main()
+{
+	return 0;
+}
+
+
+
+/*
+const int PRIMECOUNT = 28;
+const size_t primeList[PRIMECOUNT] =
+{
+	53ul, 97ul, 193ul, 389ul, 769ul,
+	1543ul, 3079ul, 6151ul, 12289ul, 24593ul,
+	49157ul, 98317ul, 196613ul, 393241ul, 786433ul,
+	1572869ul, 3145739ul, 6291469ul, 12582917ul, 25165843ul,
+	50331653ul, 100663319ul, 201326611ul, 402653189ul, 805306457ul,
+	1610612741ul, 3221225473ul, 4294967291ul
+};
+
+size_t GetNextPrime(size_t prime)
+{
+	size_t i = 0;
+	for (; i < PRIMECOUNT; ++i)
+	{
+		if (primeList[i] > prime)
+			return primeList[i];
+	}
+	return primeList[i];
+}*/
