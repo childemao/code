@@ -24,21 +24,21 @@ public:
 			case'(':
 			{
 				sc.push(ele);
-				break;
 			}
+			break;
 			case')':
 			{
 				if (sc.empty() || sc.top != '(')
 					return false;
 				else
 					sc.pop();
-				break;
 			}
+			break;
 		defaulf:
 			{
 				return false;
-				break;
 			}
+			break;
 			}
 		}
 		return true;
