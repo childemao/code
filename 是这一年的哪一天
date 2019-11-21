@@ -1,0 +1,31 @@
+ /*
+   根据输入的日期，计算是这一年的第几天。
+*/
+#include<iostream>
+using namespace std;
+int GetDay(int year, int month, int day)
+{
+	int days[13] = { 0, 31, 59, 90, 120, 151, 181, 
+		             212, 243, 273, 304, 334, 365 };
+	//这样写是为了方便你也可以在数组里面写每个月的天数不过还要加起来比较麻烦
+	int t = days[month - 1];
+	if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)
+	{//判断是否是闰年
+		if (month > 2) 
+		{//如果是闰年它也必须到了三月给二月加一才有必要
+			t += 1;
+		}
+	}
+	return t + day;
+}
+int main() {
+	int year;
+	int month;
+	int day;
+	while (cin >> year >> month >> day)  //这个是为了满足一直可以输入日期
+	{
+		int f = GetDay(year, month, day);
+		cout << f << endl;
+	}
+	return 0;
+}
