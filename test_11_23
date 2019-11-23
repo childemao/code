@@ -1,0 +1,66 @@
+#include<iostream>
+using namespace std;
+namespace bite
+{
+	template<class T>
+	class auto_ptr
+	{
+	public:
+		auto_ptr(T* ptr = nullptr)
+			: _ptr(ptr)
+			, _owner(false)
+		{
+			if (_ptr)
+				_owner = true;
+		}
+
+		auto_ptr(const auto_ptr<T>& ap)
+			: _ptr(ap._ptr)
+			, _owner(ap._owner)
+		{
+			ap._owner = false;
+		}
+
+		auto_ptr<T>& operator=(const auto_ptr<T>& ap)
+		{
+			if (this != &ap)
+			{
+				// 先处理以前旧资源
+				if (_ptr && _owner)
+					delete _ptr;
+
+				_ptr = ap._ptr;
+				_owner = ap._owner;
+				ap._owner = false;
+			}
+
+			return *this;
+		}
+
+		~auto_ptr()
+		{
+			if (_ptr && _owner)
+			{
+				delete _ptr;
+			}
+		}
+
+		T& operator*()
+		{
+			return *_ptr;
+		}
+
+		T* operator->()
+		{
+			return _ptr;
+		}
+	protected:
+		T* _ptr;
+		mutable bool _owner; // 资源真正的拥有者(对资源具有释放权利的对象)
+	};
+}
+
+int main()
+{
+	return 0;
+}
