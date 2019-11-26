@@ -1,0 +1,46 @@
+#include<iostream>
+using namespace std;
+
+//
+//int main() // C 语言中类型转换：隐式类型转化 & 显式类型转化
+//{
+//	double d = 12.34;
+//	int a = d;
+//
+//	int* pa = &a;
+//	pa = (int*)&d; // 编译阶段：直接报错
+//
+//	cout << pa << endl;
+//	cout << &d << endl;
+//
+//	const int c = 10;
+//	int* pc = (int*)&c;
+//	return 0;
+//}
+
+typedef void(*FUNC)();
+int DoSomething(int i)
+{
+	cout << "DoSomething" << endl;
+	return 0;
+}
+void Test()
+{
+	// reinterpret_cast可以编译器以FUNC的定义方式去看待DoSomething函数
+	// 所以非常的BUG，下面转换函数指针的代码是不可移植的，所以不建议这样用
+	// C++不保证所有的函数指针都被一样的使用，所以这样用有时会产生不确定的结果
+	FUNC f = reinterpret_cast<FUNC>(DoSomething);
+	f();
+}
+int main()
+{
+	double d = 12.34;
+	int a = static_cast<int>(d);
+
+	int* pa = &a;
+	pa = reinterpret_cast<int*>(&d);
+
+	const int c = 10;
+	int* pc = const_cast<int*>(&c); // const int*
+	return 0;
+}
