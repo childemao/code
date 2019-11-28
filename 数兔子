@@ -1,0 +1,37 @@
+/* 
+1. 有一只兔子，从出生后第3个月起每个月都生一只兔子，
+小兔子长到第三个月后每个月又生一只兔子，
+假如兔 子都不死，问每个月的兔子总数为多少？
+
+通过分析，考察为斐波那契数
+*/
+#include<iostream>
+using namespace std;
+int Sumrabit(int n)
+{
+	int first = 1;
+	int second = 1;
+	int c;
+	if (n >= 3)
+	{
+		for (int i = 3; i <= n; ++i)
+		{
+			c = first + second;
+			first = second;
+			second = c;
+		}
+		return c;
+	}
+	else
+		return 0;
+}
+
+int main()
+{
+	int month;
+	while (cin >> month)
+	{
+		cout << Sumrabit(month) << endl;
+	}
+	return 0;
+}
