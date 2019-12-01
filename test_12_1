@@ -1,0 +1,40 @@
+#include<iostream>
+ using namespace std;
+ class Base {
+ public: 
+	 virtual int foo(int x)
+ { 
+	 return x * 10;
+ }
+	   int foo(char x[14])
+
+	   { 
+		   cout << sizeof(x) << endl;
+		   return sizeof(x) + 10;
+	   }
+ };
+ class Derived: public Base 
+ { 
+	 int foo(int x) { 
+		 return x * 20;
+	 }
+	 virtual int foo(char x[10]) {
+		 return sizeof(x) + 20;
+	 }
+ };
+ void fib(int a[])
+ {
+	 cout << sizeof(a) << endl;
+ }
+int main()
+{ /*
+	Derived stDerived; 
+	Base *pstBase = &stDerived; 
+	char x[10];
+	printf("%d\n", pstBase->foo(100) + pstBase->foo(x)); */
+	
+	int a[3] = { 0 };
+	fib(a);
+	
+ return 0;
+}
