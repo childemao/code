@@ -1,0 +1,229 @@
+#include<iostream>
+using namespace std;
+
+//class A
+//{
+//public:
+//	A(int n)
+//		:_ptr(new int[n])
+//	{}
+//
+//	~A()
+//	{
+//		if (_ptr)
+//		{
+//			delete[] _ptr;
+//		}
+//	}
+//protected:
+//	int* _ptr;
+//};
+//void TestFunc()
+//{
+//	int* p = new int;
+//	A a(1);
+//}
+//int main()
+//{
+//	TestFunc();
+//	return 0;
+//}
+
+//智能指针
+//template<class T>
+//class SmartPtr
+//{
+//public:
+//	SmartPtr(T* ptr)
+//		: _ptr(ptr)
+//	{
+//		cout << "SmartPtr()" << endl;
+//	}
+//
+//	~SmartPtr()
+//	{
+//		cout << "~SmartPtr()" << endl;
+//		if (_ptr)
+//		{
+//			delete _ptr;
+//		}
+//	}
+//
+//	// 让该类的对象具有指针类似的行为
+//	T& operator*()
+//	{
+//		return *_ptr;
+//	}
+//
+//	T* operator->()
+//	{
+//		return _ptr;
+//	}
+//protected:
+//	T* _ptr;
+//};
+//
+//struct A
+//{
+//	int a;
+//	int b;
+//	int c;
+//};
+//
+//void TestFunc1()
+//{
+//	//int* p = new int;
+//	//SmartPtr<int> sp(p);
+//
+//	SmartPtr<int> sp1(new int);
+//	*sp1 = 100;
+//	// 解引用
+//	// ->
+//	SmartPtr<A> sp2(new A);
+//	sp2->a = 10;
+//	sp2->b = 20;
+//	sp2->c = 30;
+//}
+//
+//void TestFunc2()
+//{
+//	SmartPtr<int> sp1(new int);
+//	SmartPtr<int> sp2(sp1);
+//}
+//
+//int main()
+//{
+//	//TestFunc1();
+//	TestFunc2();
+//	return 0;
+//}
+//
+
+//namespace bite
+//{
+//	template<class T>
+//	class auto_ptr
+//	{
+//	public:
+//		auto_ptr(T* ptr)
+//			:_ptr(ptr)
+//		{}
+//		auto_ptr(auto_ptr<T>& ap)
+//			:_ptr(ap._ptr)
+//		{
+//			ap~auto_ptr = nullptr;
+//		}
+//		~auto_ptr()
+//		{
+//			if (_ptr)
+//			{
+//				delete _ptr;
+//			}
+//		}
+//		auto_ptr<T>& operater=(auto_ptr<T> & ap)
+//		{
+//			if (this != &ap)
+//			{
+//				if (_ptr)
+//				{
+//					delete _ptr;
+//				}
+//				_ptr = ap._ptr;
+//				ap.ptr = nullptr;
+//			}
+//			return *this;
+//		}
+//		T& operator*()
+//		{
+//			return *_ptr;
+//		}
+//		T* operator->()
+//		{
+//			return _ptr;
+//		}
+//	protected:
+//		T* _ptr;
+//	};
+//}
+//void TestFunc()
+//{
+//	bite::auto_ptr<int> ap1(new int);
+//	bite::auto_ptr<int> ap2(ap1);
+//	bite::auto_ptr<int> ap3(new int);
+//
+//	*ap2 = 20;
+//	ap3 = ap2;
+//}
+//int main()
+//{
+//	TestFunc();
+//	return 0;
+//}
+
+//namespace bite
+//{
+//	template<class T>
+//	class auto_ptr
+//	{
+//	public:
+//		auto_ptr(T* ptr)
+//			:_ptr(ptr)
+//			,_owner(false)
+//		{
+//			if (_ptr)
+//				_owner = true;
+//		}
+//		auto_ptr(const auto_ptr<T>& ap)
+//			:_ptr(ap._ptr)
+//			,_owner(ap._owner)
+//		{
+//			ap._owner = false;
+//		}
+//		~auto_ptr()
+//		{
+//			if (_ptr && _owner)
+//			{
+//				delete _ptr;
+//			}
+//		}
+//		auto_ptr<T>& operater = (const auto_ptr<T> & ap)
+//		{
+//			if (this != &ap)
+//			{
+//				if (_ptr && _owner)
+//				{
+//					delete _ptr;
+//				}
+//				_ptr = ap._ptr;
+//				_owner = ap._owner;
+//				ap._owner = false;
+//			}
+//			return *this;
+//		}
+//		T& operator*()
+//		{
+//			return *_ptr;
+//		}
+//		T* operator->()
+//		{
+//			return _ptr;
+//		}
+//	protected:
+//		T* _ptr;
+//		multable bool _owner;
+//	};
+//}
+//void TestFunc()
+//{
+//	bite::auto_ptr<int> ap1(new int);
+//	bite::auto_ptr<int> ap2(ap1);
+//	bite::auto_ptr<int> ap3(new int);
+//
+//	*ap2 = 20;
+//	ap3 = ap2;
+//}
+//int main()
+//{
+//	TestFunc();
+//	return 0;
+//}
