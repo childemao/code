@@ -1,0 +1,28 @@
+#define _CRT_SECURE_NO_WARNINGS 1
+//最小栈设计思路：先申请两个栈，一个栈按进入顺序放置元素，另一个栈放置最小的元素
+#include<vector>
+#include<stack>
+#include<iostream>
+using namespace std;
+stack<int> s1;
+stack<int> smin;
+void push(int x) {
+	s1.push(x);
+	if (smin.empty() || smin.top >= x)
+		smin.push(x);
+}
+void pop() {
+	s1.pop();
+	if (s1.top() == smin.top())
+		smin.pop();
+}
+int top() {
+	return s1.top();
+}
+int getmin() {
+	return smin.top();
+}
+int main()
+{
+	return 0;
+}
