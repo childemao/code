@@ -1,0 +1,31 @@
+//输入一个链表，按链表从尾到头的顺序返回一个ArrayList。
+/**
+*  struct ListNode {
+*        int val;
+*        struct ListNode *next;
+*        ListNode(int x) :
+*              val(x), next(NULL) {
+*        }
+*  };
+*/
+//思路：将链表遍历一遍，将每个节点的数字放入栈内，从栈中依次取出数据放入顺序表中。
+class Solution {
+public:
+    vector<int> printListFromTailToHead(ListNode* head) {
+        vector <int> result;
+        stack <int> arr;
+        ListNode *cur = head;
+        while(cur != nullptr)
+        {
+            arr.push(cur->val);
+            cur = cur->next;
+        }
+        int size = arr.size();
+        for(int i = 0;i < size;++i)
+        {
+            result.push_back(arr.top());
+            arr.pop();
+        }
+      return result;
+    }
+};
