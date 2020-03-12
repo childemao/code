@@ -1,0 +1,27 @@
+//问题描述：输入一个整数数组，实现一个函数来调整该数组中数字的顺序，使得所有的奇数位于数组的前半部分，
+//所有的偶数位于数组的后半部分，并保证奇数和奇数，偶数和偶数之间的相对位置不变。
+/*思路：遍历数组，将奇数和偶数分隔开来，分别存入vector容器中，然后将奇数先取出，然后将偶数在取出。
+class Solution {
+public:
+    void reOrderArray(vector<int> &array) {
+        vector<int> q1;//奇数
+        vector<int> q2;//偶数
+        int j = 0;
+        for(unsigned int i = 0;i < array.size(); ++i)
+        {
+            if(array[i] % 2 == 1)
+                q1.push_back(array[i]);
+            else
+                q2.push_back(array[i]);
+        }
+        for(unsigned int i = 0; i < q1.size(); ++ i)
+        {
+            array[j++] = q1[i];
+        }
+         for(unsigned int i = 0; i < q2.size(); ++ i)
+        {
+            array[j++] = q2[i];
+        }
+         
+    }
+};
