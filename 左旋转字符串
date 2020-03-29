@@ -1,0 +1,14 @@
+class Solution {
+public:
+    string LeftRotateString(string str, int n) {
+        if(n < 0)
+            return nullptr;
+        if(n == 0)
+            return str;
+        string s1 = "";
+        s1 = str.substr(0, n);//赋值前n个字符串
+        str.erase(0, n);//清空前n个字符串
+        str = str + s1;
+        return str;
+    }
+};
