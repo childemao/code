@@ -1,0 +1,25 @@
+#include<iostream>
+using namespace std;
+#include<vector>
+int main()
+{
+	int n;
+	cin >> n;
+	vector<int> v(n, 0);
+	for (int i = 0; i < n; ++i)
+	{
+		cin >> v[i];
+	}
+	int max = v[0];
+	int sum = 0;
+	for (int i = 0; i < n; i++)
+	{
+		sum += v[i];
+		if (sum < v[i])//(第一个数为负数，第二个数为正数，
+			sum = v[i];//加起来后，肯定小于第二个数）
+		if (max < sum)
+			max = sum;//保存最大数(如果最后一个数为负数，sum就小于max)
+	}
+	cout << sum << endl;
+	return 0;
+}
