@@ -1,0 +1,17 @@
+#include < mutex>
+class single {
+
+volatile static T* _data; //防止编译器过度优化后出现逻辑问题
+public：
+T *get_instance()  //两个线程同时调用这个函数
+{
+   if(_data == NULL) 
+   { //外部进行二次判断，尽可能降低锁冲突概率
+         mutex.lock();
+        if(_data == NULL)   // 只有一个能创建实例。
+           _data = new T(); //实例化资源的过程是一个非原子操作， 需要保护起来
+            mutex.unlock();
+    }
+    return _data;
+}
+};
